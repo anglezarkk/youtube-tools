@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ $2 = "nb" ]
+then
+    basename="%03d %c.mkv"
+else 
+    basename="%c.mkv"
+fi
+
+mkdir .tmp_ytdl
+cd .tmp_ytdl
+
+youtube-dl --add-metadata --output "%(title)s.%(ext)s" $1
+
+for input in *.mkv
+do
+    folder=$(basename "${input/.mkv}")
+    mkdir "$folder"
+    mkvmerge -o "$folder/$basename" --split chapters:all "$input"
+    rm "$input"
+done
+
+for folder in *
+do
+    if [ -d "${folder}" ]
+    then
+        cd "$folder"
+        for input_chapter in *.mkv
+        do 
+            ffmpeg -i "$input_chapter" -acodec libmp3lame -ab 320k -map_metadata -1 "$(basename "${input_chapter/.mkv}")".mp3
+        done
+        rm *.mkv
+        cd ..
+        mv "$folder" ..
+    fi
+done
+cd ..
+rmdir .tmp_ytdl

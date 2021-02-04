@@ -5,6 +5,7 @@ A set of scripts used to make my life easier archiving youtube content
 
 ffmpeg
 mkvtoolnix
+youtube-dl
 
 ## Usage :
 
